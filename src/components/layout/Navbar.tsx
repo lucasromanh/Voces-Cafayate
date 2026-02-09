@@ -8,6 +8,15 @@ const Navbar = () => {
     const { user, logout, isAuthenticated } = useAuth();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = React.useState(false);
+    const [scrolled, setScrolled] = React.useState(false);
+
+    React.useEffect(() => {
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleLogout = () => {
         logout();
@@ -15,7 +24,10 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100">
+        <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+                ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 py-0"
+                : "bg-transparent py-4 border-b border-transparent"
+            }`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-20 items-center">
                     <div className="flex items-center">
@@ -24,21 +36,25 @@ const Navbar = () => {
                         </Link>
                     </div>
 
-                    <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
+                    <div className="hidden md:flex items-center space-x-10 text-[11px] font-black uppercase tracking-[0.2em] text-gray-deep">
                         <Link to="/" className="hover:text-primary transition-colors">Inicio</Link>
                         {!isAuthenticated ? (
-                            <Link to="/login" className="btn-primary">Ingreso</Link>
+                            <Link to="/login" className="bg-primary text-white px-8 py-3.5 rounded-full font-black hover:bg-primary-hover transition-all shadow-xl shadow-primary/10 active:scale-95">
+                                Ingreso
+                            </Link>
                         ) : (
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-6">
                                 <Link
                                     to={user?.rol === 'ADMIN' ? '/admin' : user?.rol === 'PROFESIONAL' ? '/profesional' : '/familia'}
-                                    className="flex items-center space-x-2 text-gray-voces hover:text-primary transition-colors"
+                                    className="flex items-center space-x-3 text-gray-deep hover:text-primary transition-colors group"
                                 >
-                                    <User size={18} />
-                                    <span>{user?.nombre}</span>
+                                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                                        <User size={16} />
+                                    </div>
+                                    <span className="font-black">{user?.nombre}</span>
                                 </Link>
-                                <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 transition-colors">
-                                    <LogOut size={18} />
+                                <button onClick={handleLogout} className="w-8 h-8 rounded-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-100 transition-all">
+                                    <LogOut size={16} />
                                 </button>
                             </div>
                         )}

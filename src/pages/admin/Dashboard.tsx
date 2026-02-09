@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Paciente, Turno, Taller } from '../../types';
 import { useToast } from '../../context/ToastContext';
+import PatientFileViewer from '../../components/PatientFileViewer';
 
 const StatCard = ({ title, value, icon, color }: any) => (
     <div className="card hover:shadow-2xl transition-all duration-300 group">
@@ -36,6 +37,7 @@ const AdminDashboard = () => {
     const [showNewModal, setShowNewModal] = useState(false);
     const [showTurnoModal, setShowTurnoModal] = useState(false);
     const [selectedPaciente, setSelectedPaciente] = useState<Paciente | null>(null);
+    const [viewingPatientFile, setViewingPatientFile] = useState<Paciente | null>(null);
     const [selectedTallerDetail, setSelectedTallerDetail] = useState<Taller | null>(null);
 
     // Forms State
@@ -141,8 +143,13 @@ const AdminDashboard = () => {
         }
     }, [talleres, selectedTallerDetail?.id]);
 
+    // Scroll to top on tab change
+    React.useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [activeTab]);
+
     return (
-        <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
+        <div className="pt-32 pb-8 px-4 md:px-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700">
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -284,7 +291,7 @@ const AdminDashboard = () => {
                                                                 <Info size={18} />
                                                             </button>
                                                             <button
-                                                                onClick={() => downloadMockPDF(p)}
+                                                                onClick={() => setViewingPatientFile(p)}
                                                                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
                                                                 title="Ficha PDF"
                                                             >
@@ -309,7 +316,11 @@ const AdminDashboard = () => {
                                 </h3>
                                 <div className="space-y-4">
                                     {talleres.slice(0, 2).map(t => (
-                                        <div key={t.id} className="p-4 rounded-3xl border-2 border-gray-50 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group">
+                                        <div
+                                            key={t.id}
+                                            onClick={() => setSelectedTallerDetail(t)}
+                                            className="p-4 rounded-3xl border-2 border-gray-50 hover:border-primary/20 hover:bg-primary/5 transition-all cursor-pointer group"
+                                        >
                                             <h4 className="font-black text-sm mb-1 group-hover:text-primary transition-colors">{t.nombre}</h4>
                                             <div className="flex items-center space-x-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                                                 <span className="flex items-center space-x-1">
@@ -527,8 +538,8 @@ const AdminDashboard = () => {
             {/* Modal: Nuevo Paciente */}
             {showNewModal && (
                 <div className="modal-overlay z-[100] fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in zoom-in duration-300">
-                    <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden overflow-y-auto max-h-[90vh]">
-                        <div className="p-10 border-b border-gray-50 flex justify-between items-center sticky top-0 bg-white z-10">
+                    <div className="bg-[#FFF9F5] w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-y-auto max-h-[92vh] [&::-webkit-scrollbar]:w-0 scrollbar-hide">
+                        <div className="p-10 border-b border-orange-100/50 flex justify-between items-center sticky top-0 bg-[#FFF9F5]/95 backdrop-blur-sm z-10">
                             <div>
                                 <h3 className="text-3xl font-black text-gray-900 tracking-tighter">Nuevo Paciente</h3>
                                 <p className="text-gray-400 text-xs font-black uppercase tracking-widest mt-1">Ficha de ingreso institucional</p>
@@ -537,9 +548,9 @@ const AdminDashboard = () => {
                                 <X size={28} className="text-gray-400" />
                             </button>
                         </div>
-                        <form onSubmit={handleAddPaciente} className="p-10 space-y-8">
+                        <form onSubmit={handleAddPaciente} className="p-10 space-y-10">
                             {/* Sección 1: Datos Generales y CUD */}
-                            <div className="bg-gray-50/50 p-6 rounded-[2rem] space-y-6">
+                            <div className="bg-white/60 backdrop-blur-sm p-8 rounded-[2.5rem] space-y-8 border border-orange-100/30 shadow-sm shadow-orange-900/5">
                                 <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">I. Datos Generales e Identificación</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
@@ -864,7 +875,7 @@ const AdminDashboard = () => {
                                 {/* Botones de Acción */}
                                 <div className="flex flex-col md:flex-row gap-4 pt-4 border-t border-gray-100">
                                     <button
-                                        onClick={() => downloadMockPDF(selectedPaciente)}
+                                        onClick={() => setViewingPatientFile(selectedPaciente)}
                                         className="flex-1 flex items-center justify-center space-x-3 bg-blue-600 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]"
                                     >
                                         <Download size={18} />
@@ -1059,6 +1070,14 @@ const AdminDashboard = () => {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {/* Modal: Patient File Viewer (PDF) */}
+            {viewingPatientFile && (
+                <PatientFileViewer
+                    paciente={viewingPatientFile}
+                    onClose={() => setViewingPatientFile(null)}
+                />
             )}
         </div>
     );

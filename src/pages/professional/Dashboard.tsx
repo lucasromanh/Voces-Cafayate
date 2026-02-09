@@ -4,21 +4,25 @@ import { useAuth } from '../../hooks/useAuth';
 import {
     CheckCircle2, Circle, Clock, FileText, UserPlus, ClipboardList,
     X, Plus, Calendar, Users, Activity, TrendingUp, AlertCircle,
-    ChevronRight, Eye, Edit3, Save, Download, Image as ImageIcon
+    ChevronRight, Eye, Edit3, Save, Download, Share2, ImageIcon
 } from 'lucide-react';
 import { Paciente, Especialidad } from '../../types';
 import CalendarComponent, { Turno as CalendarTurno } from '../../components/Calendar';
 import InformeForm from '../../components/InformeForm';
+import ReportViewer from '../../components/ReportViewer';
 import { useToast } from '../../context/ToastContext';
 
 const ProfessionalDashboard = () => {
     const { user } = useAuth();
-    const { turnos, pacientes, updateTurnoEstado, seguimientos, toggleSeguimiento, addInforme, informes, addPaciente, addTurno, talleres, addTaller, addDocumentoTaller } = useData();
+    const { turnos, pacientes, updateTurnoEstado, seguimientos, toggleSeguimiento, addInforme, updateInforme, informes, addPaciente, addTurno, talleres, addTaller, addDocumentoTaller } = useData();
     const { showToast } = useToast();
 
     // UI State
     const [activeTab, setActiveTab] = useState<'agenda' | 'calendar' | 'patients' | 'reports' | 'workshops'>('agenda');
     const [showInformeModal, setShowInformeModal] = useState(false);
+    const [editingInforme, setEditingInforme] = useState<any | null>(null);
+    const [viewingInforme, setViewingInforme] = useState<any | null>(null);
+    const [showShareModal, setShowShareModal] = useState<any | null>(null);
     const [showNewPacienteModal, setShowNewPacienteModal] = useState(false);
     const [selectedPacienteForReport, setSelectedPacienteForReport] = useState<string>('');
     const [showConfirmCancelModal, setShowConfirmCancelModal] = useState<string | null>(null);
@@ -90,16 +94,31 @@ const ProfessionalDashboard = () => {
     };
 
     const handleAddInforme = (informeData: any) => {
-        addInforme({
-            ...informeData,
-            id: `inf${Date.now()}`,
-            creadoPorProfesionalId: proId,
-            coProfesionalesIds: informeData.coProfesionalesIds || []
-        });
+        if (editingInforme) {
+            updateInforme(editingInforme.id, informeData);
+            showToast("Informe actualizado exitosamente", "success");
+        } else {
+            addInforme({
+                ...informeData,
+                id: `inf${Date.now()}`,
+                creadoPorProfesionalId: proId,
+                coProfesionalesIds: informeData.coProfesionalesIds || []
+            });
+            showToast("Informe guardado exitosamente", "success");
+        }
 
         setShowInformeModal(false);
+        setEditingInforme(null);
         setSelectedPacienteForReport('');
-        showToast("Informe guardado exitosamente", "success");
+    };
+
+    const handleShareInforme = (informeId: string, tipo: 'COMPLETO' | 'GENERAL') => {
+        updateInforme(informeId, {
+            visibleParaFamilia: true,
+            compartidoTipo: tipo
+        });
+        setShowShareModal(null);
+        showToast("Informe enviado a la familia exitosamente", "success");
     };
 
     // Sincronizar el detalle del taller cuando los datos globales cambian (muy importante para archivos)
@@ -185,7 +204,7 @@ const ProfessionalDashboard = () => {
     };
 
     return (
-        <div className="p-4 md:p-10 max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
+        <div className="pt-32 pb-10 px-4 md:px-10 max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
@@ -249,7 +268,7 @@ const ProfessionalDashboard = () => {
             {/* Quick Action */}
             <div className="flex flex-col sm:flex-row flex-wrap gap-4">
                 <button
-                    onClick={() => setShowInformeModal(true)}
+                    onClick={() => { setEditingInforme(null); setShowInformeModal(true); }}
                     className="flex-1 flex items-center justify-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-gray-200"
                 >
                     <FileText size={18} />
@@ -475,7 +494,7 @@ const ProfessionalDashboard = () => {
                         <div className="flex justify-between items-center mb-8">
                             <h3 className="font-black text-2xl text-gray-900 tracking-tighter">Mis Informes</h3>
                             <button
-                                onClick={() => setShowInformeModal(true)}
+                                onClick={() => { setEditingInforme(null); setShowInformeModal(true); }}
                                 className="btn-primary px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest"
                             >
                                 Nuevo Informe
@@ -505,11 +524,27 @@ const ProfessionalDashboard = () => {
                                                 {inf.informeGeneral?.situacionActual || 'Sin descripción'}
                                             </p>
                                             <div className="flex gap-2">
-                                                <button className="flex-1 py-2 bg-gray-50 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-all">
-                                                    Ver
+                                                <button
+                                                    onClick={() => setViewingInforme(inf)}
+                                                    className="flex-1 py-2 bg-gray-50 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-100 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Eye size={14} /> Ver
                                                 </button>
-                                                <button className="flex-1 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-100 transition-all">
-                                                    Editar
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingInforme(inf);
+                                                        setSelectedPacienteForReport(inf.pacienteId);
+                                                        setShowInformeModal(true);
+                                                    }}
+                                                    className="flex-1 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-blue-100 transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <Edit3 size={14} /> Editar
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowShareModal(inf)}
+                                                    className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${inf.visibleParaFamilia ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600 hover:bg-orange-100'}`}
+                                                >
+                                                    <Share2 size={14} /> {inf.visibleParaFamilia ? 'Compartido' : 'Compartir'}
                                                 </button>
                                             </div>
                                         </div>
@@ -524,6 +559,56 @@ const ProfessionalDashboard = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Modal: Share Report */}
+            {showShareModal && (
+                <div className="modal-overlay z-[110] fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+                    <div className="bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in duration-300">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="font-black text-2xl text-gray-900 tracking-tighter uppercase">Enviar a Familia</h3>
+                            <button onClick={() => setShowShareModal(null)} className="p-2 hover:bg-gray-100 rounded-full">
+                                <X size={24} className="text-gray-400" />
+                            </button>
+                        </div>
+                        <p className="text-gray-500 text-sm mb-8 font-medium">
+                            ¿Qué versión del informe deseas que sea visible para la familia en su portal?
+                        </p>
+                        <div className="space-y-4">
+                            <button
+                                onClick={() => handleShareInforme(showShareModal.id, 'GENERAL')}
+                                className="w-full flex items-center justify-between p-6 bg-orange-50 border-2 border-orange-100 rounded-3xl hover:border-orange-200 transition-all text-left group"
+                            >
+                                <div>
+                                    <p className="font-black text-orange-950 uppercase text-xs tracking-widest mb-1">Versión Familiar</p>
+                                    <p className="text-[10px] text-orange-800 font-bold opacity-70 italic tracking-tight">Lenguaje sencillo, sin tecnicismos complejos.</p>
+                                </div>
+                                <ChevronRight className="text-orange-400 transition-transform group-hover:translate-x-1" />
+                            </button>
+                            <button
+                                onClick={() => handleShareInforme(showShareModal.id, 'COMPLETO')}
+                                className="w-full flex items-center justify-between p-6 bg-blue-50 border-2 border-blue-100 rounded-3xl hover:border-blue-200 transition-all text-left group"
+                            >
+                                <div>
+                                    <p className="font-black text-blue-950 uppercase text-xs tracking-widest mb-1">Informe Completo</p>
+                                    <p className="text-[10px] text-blue-800 font-bold opacity-70 italic tracking-tight">Incluye detalles técnicos y clínicos completos.</p>
+                                </div>
+                                <ChevronRight className="text-blue-400 transition-transform group-hover:translate-x-1" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal: View Report */}
+            {viewingInforme && (
+                <ReportViewer
+                    informe={viewingInforme}
+                    paciente={pacientes.find(p => p.id === viewingInforme.pacienteId)}
+                    profesional={user ? { ...user, especialidad: profesionalEspecialidad } as any : undefined}
+                    mode={viewingInforme.compartidoTipo || 'COMPLETO'}
+                    onClose={() => setViewingInforme(null)}
+                />
             )}
 
             {/* Calendar View */}
@@ -552,8 +637,10 @@ const ProfessionalDashboard = () => {
                     onClose={() => {
                         setShowInformeModal(false);
                         setSelectedPacienteForReport('');
+                        setEditingInforme(null);
                     }}
                     onSave={handleAddInforme}
+                    initialData={editingInforme}
                 />
             )}
 

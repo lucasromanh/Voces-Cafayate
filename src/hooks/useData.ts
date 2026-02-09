@@ -65,6 +65,10 @@ export const useData = () => {
         return newI;
     };
 
+    const updateInforme = (id: string, updates: Partial<Informe>) => {
+        setInformes(informes.map(i => i.id === id ? { ...i, ...updates } : i));
+    };
+
     const addSeguimiento = (s: Omit<Seguimiento, 'id'>) => {
         const newS = { ...s, id: Math.random().toString(36).substr(2, 9) };
         setSeguimientos([...seguimientos, newS]);
@@ -101,7 +105,7 @@ export const useData = () => {
 
     return {
         pacientes, profesionales, turnos, usuarios, obrasSociales, talleres, informes, seguimientos,
-        addPaciente, updatePaciente, addTurno, updateTurnoEstado, addInforme, addSeguimiento, toggleSeguimiento,
+        addPaciente, updatePaciente, addTurno, updateTurnoEstado, addInforme, updateInforme, addSeguimiento, toggleSeguimiento,
         addTaller, updateTallerEstado, addDocumentoTaller
     };
 };

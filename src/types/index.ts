@@ -205,6 +205,7 @@ export interface Informe {
 
     // Metadata
     visibleParaFamilia: boolean;
+    compartidoTipo?: 'COMPLETO' | 'GENERAL';
     requiereInterconsulta: boolean;
     especialidadesInterconsulta?: Especialidad[];
     estadoInterconsulta?: "PENDIENTE" | "EN_REVISION" | "COMPLETADA";

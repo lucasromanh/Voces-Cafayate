@@ -16,17 +16,18 @@ interface InformeFormProps {
     pacienteId: string;
     onClose: () => void;
     onSave: (data: any) => void;
+    initialData?: any;
 }
 
-const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onClose, onSave }) => {
+const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onClose, onSave, initialData }) => {
     const [activeTab, setActiveTab] = useState<'tecnico' | 'general'>('tecnico');
     const [autoGenerating, setAutoGenerating] = useState(false);
 
     // Informe Técnico (varía según especialidad)
-    const [informeTecnico, setInformeTecnico] = useState<any>({});
+    const [informeTecnico, setInformeTecnico] = useState<any>(initialData?.informeTecnico || {});
 
     // Informe General (común para todas las especialidades)
-    const [informeGeneral, setInformeGeneral] = useState<InformeGeneral>({
+    const [informeGeneral, setInformeGeneral] = useState<InformeGeneral>(initialData?.informeGeneral || {
         situacionActual: '',
         progresoObservado: '',
         areasFortaleza: '',
@@ -37,10 +38,21 @@ const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onC
         observacionesAdicionales: ''
     });
 
-    const [tipoInforme, setTipoInforme] = useState<TipoInforme>('SEGUIMIENTO');
-    const [requiereInterconsulta, setRequiereInterconsulta] = useState(false);
-    const [especialidadesInterconsulta, setEspecialidadesInterconsulta] = useState<Especialidad[]>([]);
-    const [visibleParaFamilia, setVisibleParaFamilia] = useState(true);
+    const [tipoInforme, setTipoInforme] = useState<TipoInforme>(initialData?.tipo || 'SEGUIMIENTO');
+    const [requiereInterconsulta, setRequiereInterconsulta] = useState(initialData?.requiereInterconsulta || false);
+    const [especialidadesInterconsulta, setEspecialidadesInterconsulta] = useState<Especialidad[]>(initialData?.especialidadesInterconsulta || []);
+    const [visibleParaFamilia, setVisibleParaFamilia] = useState(initialData?.visibleParaFamilia !== undefined ? initialData.visibleParaFamilia : true);
+
+    useEffect(() => {
+        if (initialData) {
+            setInformeTecnico(initialData.informeTecnico || {});
+            setInformeGeneral(initialData.informeGeneral || {});
+            setTipoInforme(initialData.tipo || 'SEGUIMIENTO');
+            setRequiereInterconsulta(initialData.requiereInterconsulta || false);
+            setEspecialidadesInterconsulta(initialData.especialidadesInterconsulta || []);
+            setVisibleParaFamilia(initialData.visibleParaFamilia !== undefined ? initialData.visibleParaFamilia : true);
+        }
+    }, [initialData]);
 
     // Auto-generar informe general desde el técnico
     const autoGenerarInformeGeneral = () => {
@@ -169,7 +181,9 @@ const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onC
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-primary/5 to-transparent flex-shrink-0">
                     <div>
-                        <h3 className="text-2xl font-black text-gray-900 tracking-tighter">Nuevo Informe - {especialidad}</h3>
+                        <h3 className="text-2xl font-black text-gray-900 tracking-tighter">
+                            {initialData ? 'Editar Informe' : 'Nuevo Informe'} - {especialidad}
+                        </h3>
                         <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest mt-1">
                             Informe técnico + Informe para familia
                         </p>
@@ -184,8 +198,8 @@ const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onC
                     <button
                         onClick={() => setActiveTab('tecnico')}
                         className={`px-6 py-4 font-black text-xs uppercase tracking-widest transition-all relative ${activeTab === 'tecnico'
-                                ? 'text-primary'
-                                : 'text-gray-400 hover:text-gray-600'
+                            ? 'text-primary'
+                            : 'text-gray-400 hover:text-gray-600'
                             }`}
                     >
                         <FileText size={16} className="inline mr-2" />
@@ -197,8 +211,8 @@ const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onC
                     <button
                         onClick={() => setActiveTab('general')}
                         className={`px-6 py-4 font-black text-xs uppercase tracking-widest transition-all relative ${activeTab === 'general'
-                                ? 'text-primary'
-                                : 'text-gray-400 hover:text-gray-600'
+                            ? 'text-primary'
+                            : 'text-gray-400 hover:text-gray-600'
                             }`}
                     >
                         <Users size={16} className="inline mr-2" />
@@ -294,8 +308,8 @@ const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onC
                                                         );
                                                     }}
                                                     className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${especialidadesInterconsulta.includes(esp)
-                                                            ? 'bg-primary text-white'
-                                                            : 'bg-white text-gray-600 hover:bg-gray-100'
+                                                        ? 'bg-primary text-white'
+                                                        : 'bg-white text-gray-600 hover:bg-gray-100'
                                                         }`}
                                                 >
                                                     {esp}

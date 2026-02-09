@@ -28,7 +28,10 @@ const Footer = () => {
                         <ul className="space-y-4 text-sm">
                             <li className="flex items-center space-x-3 text-gray-400">
                                 <Phone size={16} className="text-primary" />
-                                <span>3868-438285</span>
+                                <a href="tel:+543868438285" className="hover:text-primary transition-all relative group">
+                                    3868-438285
+                                    <span className="absolute left-0 bottom-0 w-0 h-[1px] bg-primary transition-all duration-300 group-hover:w-full"></span>
+                                </a>
                             </li>
                             <li className="flex items-center space-x-3 text-gray-400">
                                 <MapPin size={16} className="text-primary" />

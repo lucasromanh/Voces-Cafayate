@@ -5,9 +5,10 @@ import { useToast } from '../../context/ToastContext';
 import {
     Calendar, FileText, Download, Send, MessageSquare,
     Bell, User, ChevronRight, Clock, Star, DownloadCloud,
-    AlertCircle, CheckCircle2, Info, X
+    AlertCircle, CheckCircle2, Info, X, Eye
 } from 'lucide-react';
 import { mockObrasSociales } from '../../mockData';
+import ReportViewer from '../../components/ReportViewer';
 
 const FamilyPortal = () => {
     const { user } = useAuth();
@@ -15,6 +16,7 @@ const FamilyPortal = () => {
     const { showToast } = useToast();
     const [message, setMessage] = useState('');
     const [sending, setSending] = useState(false);
+    const [viewingReport, setViewingReport] = useState<any | null>(null);
 
     // Find child(ren) for this tutor
     const myChildren = pacientes.filter(p => p.tutorPrincipalId === user?.id);
@@ -44,7 +46,7 @@ const FamilyPortal = () => {
     };
 
     return (
-        <div className="p-4 md:p-10 max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
+        <div className="pt-32 pb-10 px-4 md:px-10 max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700">
             {/* Hero Profile Section */}
             <div className="relative rounded-[3rem] overflow-hidden bg-gray-900 p-8 md:p-12 text-white shadow-2xl shadow-gray-200">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32" />
@@ -162,11 +164,11 @@ const FamilyPortal = () => {
                                             </p>
                                         </div>
                                         <button
-                                            onClick={() => handleDownloadReport(inf.tipo)}
+                                            onClick={() => setViewingReport(inf)}
                                             className="w-full flex items-center justify-center gap-3 py-4 bg-gray-50 rounded-2xl text-xs font-black uppercase tracking-widest text-blue-600 hover:bg-blue-600 hover:text-white transition-all group"
                                         >
-                                            <DownloadCloud size={18} className="group-hover:-translate-y-1 transition-transform" />
-                                            <span>Descargar PDF</span>
+                                            <Eye size={18} className="group-hover:scale-110 transition-transform" />
+                                            <span>Ver Informe</span>
                                         </button>
                                     </div>
                                 ))
@@ -243,6 +245,16 @@ const FamilyPortal = () => {
                     </div>
                 </div>
             </div>
+            {/* Modal: View Report */}
+            {viewingReport && (
+                <ReportViewer
+                    informe={viewingReport}
+                    paciente={selectedChild}
+                    profesional={usuarios.find(u => u.id === profesionales.find(p => p.id === viewingReport.creadoPorProfesionalId)?.usuarioId) as any}
+                    mode={viewingReport.compartidoTipo || 'GENERAL'}
+                    onClose={() => setViewingReport(null)}
+                />
+            )}
         </div>
     );
 };

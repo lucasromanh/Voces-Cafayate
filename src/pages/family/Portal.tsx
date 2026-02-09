@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useData } from '../../hooks/useData';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
 import {
     Calendar, FileText, Download, Send, MessageSquare,
     Bell, User, ChevronRight, Clock, Star, DownloadCloud,
-    AlertCircle, CheckCircle2, Info
+    AlertCircle, CheckCircle2, Info, X
 } from 'lucide-react';
 import { mockObrasSociales } from '../../mockData';
 
 const FamilyPortal = () => {
     const { user } = useAuth();
     const { pacientes, turnos, informes, profesionales, usuarios } = useData();
+    const { showToast } = useToast();
     const [message, setMessage] = useState('');
     const [sending, setSending] = useState(false);
 
@@ -29,13 +31,16 @@ const FamilyPortal = () => {
         // Simulate API delay
         setTimeout(() => {
             setSending(false);
+            showToast("Mensaje enviado correctamente. El equipo te responderá pronto.", "success");
             setMessage('');
-            alert("¡Mensaje enviado correctamente! El equipo técnico o el profesional asignado te responderá pronto.");
         }, 1500);
     };
 
-    const downloadReport = (reportType: string) => {
-        alert(`Generando archivo PDF para "${reportType.replace(/_/g, ' ')}"... Se descargará en unos segundos.`);
+    const handleDownloadReport = (reportType: string) => {
+        showToast(`Generando archivo PDF para "${reportType.replace(/_/g, ' ')}"...`, "download");
+        setTimeout(() => {
+            showToast("Informe descargado correctamente", "success");
+        }, 2000);
     };
 
     return (
@@ -153,11 +158,11 @@ const FamilyPortal = () => {
                                                 {inf.tipo.replace(/_/g, ' ')}
                                             </h4>
                                             <p className="text-sm text-gray-500 font-medium line-clamp-3 mb-8">
-                                                {inf.resumen || "Resumen del encuentro clínico y avances terapéuticos."}
+                                                {inf.informeGeneral?.situacionActual || "Avance del encuentro clínico y evolución terapéutica."}
                                             </p>
                                         </div>
                                         <button
-                                            onClick={() => downloadReport(inf.tipo)}
+                                            onClick={() => handleDownloadReport(inf.tipo)}
                                             className="w-full flex items-center justify-center gap-3 py-4 bg-gray-50 rounded-2xl text-xs font-black uppercase tracking-widest text-blue-600 hover:bg-blue-600 hover:text-white transition-all group"
                                         >
                                             <DownloadCloud size={18} className="group-hover:-translate-y-1 transition-transform" />

@@ -48,10 +48,21 @@ export const mockPacientes: Paciente[] = [
         tieneCUD: true,
         numeroCUD: 'CUD-9988-77',
         diagnosticoPrincipal: 'TEL (Trastorno Específico del Lenguaje)',
-        escolaridad: 'Primaria - Escuela Normal',
+        escolaridad: 'Primaria',
+        escuelaNombre: 'Escuela Normal',
+        escuelaTurno: 'TARDE',
         tutorPrincipalId: 'u4',
+        tutorSecundarioNombre: 'Jorge López',
+        tutorSecundarioParentesco: 'Padre',
+        tutorSecundarioTelefono: '3868111222',
         obrasSociales: ['os1'],
-        notasRelevantes: 'Alergia al gluten.'
+        notasRelevantes: 'Alergia al gluten.',
+        discapacidadFisica: false,
+        retrasoDesarrollo: true,
+        retrasoDesarrolloDetalle: 'Retraso leve en el inicio de la marcha.',
+        hermanos: '1 hermano menor (2 años)',
+        composicionFamiliar: 'Nucleo biológico: Madre, Padre y hermano.',
+        telefonoEmergencia: '3868555444'
     }
 ];
 
@@ -77,6 +88,20 @@ export const mockTalleres: Taller[] = [
         fechaHora: new Date(Date.now() + 172800000).toISOString(),
         cupoMaximo: 10,
         profesionalesResponsables: ['p1'],
-        inscritos: ['pa1']
+        inscritos: ['pa1'],
+        estado: 'APROBADO',
+        creadoPorId: 'u1' // Admin
+    },
+    {
+        id: 'tal2',
+        nombre: 'Estimulación del Lenguaje',
+        descripcion: 'Taller lúdico para el desarrollo de la conciencia fonológica.',
+        orientadoA: 'Niños 3-5 años',
+        fechaHora: new Date(Date.now() + 259200000).toISOString(),
+        cupoMaximo: 8,
+        profesionalesResponsables: ['p1'],
+        inscritos: [],
+        estado: 'PROPUESTO',
+        creadoPorId: 'u2' // Laura (Profesional)
     }
 ];

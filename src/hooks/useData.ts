@@ -71,12 +71,37 @@ export const useData = () => {
         return newS;
     };
 
+    const addTaller = (t: Omit<Taller, 'id'>) => {
+        const newT = { ...t, id: Math.random().toString(36).substr(2, 9) };
+        setTalleres([...talleres, newT]);
+        return newT;
+    };
+
+    const updateTallerEstado = (id: string, estado: Taller['estado']) => {
+        setTalleres(talleres.map(t => t.id === id ? { ...t, estado } : t));
+    };
+
+    const addDocumentoTaller = (tallerId: string, doc: Omit<NonNullable<Taller['documentos']>[0], 'id' | 'fecha'>) => {
+        setTalleres(talleres.map(t => {
+            if (t.id === tallerId) {
+                const newDoc = {
+                    ...doc,
+                    id: Math.random().toString(36).substr(2, 9),
+                    fecha: new Date().toISOString()
+                };
+                return { ...t, documentos: [...(t.documentos || []), newDoc] };
+            }
+            return t;
+        }));
+    };
+
     const toggleSeguimiento = (id: string) => {
         setSeguimientos(seguimientos.map(s => s.id === id ? { ...s, estado: s.estado === 'COMPLETADO' ? 'PENDIENTE' : 'COMPLETADO' } : s));
     };
 
     return {
         pacientes, profesionales, turnos, usuarios, obrasSociales, talleres, informes, seguimientos,
-        addPaciente, updatePaciente, addTurno, updateTurnoEstado, addInforme, addSeguimiento, toggleSeguimiento
+        addPaciente, updatePaciente, addTurno, updateTurnoEstado, addInforme, addSeguimiento, toggleSeguimiento,
+        addTaller, updateTallerEstado, addDocumentoTaller
     };
 };

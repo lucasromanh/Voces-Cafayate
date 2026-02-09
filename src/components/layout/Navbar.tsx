@@ -55,13 +55,30 @@ const Navbar = () => {
             {isOpen && (
                 <div className="md:hidden bg-white border-b border-gray-100 animate-in slide-in-from-top duration-300">
                     <div className="px-4 pt-2 pb-6 space-y-2">
-                        <Link to="/" className="block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>Inicio</Link>
+                        <Link to="/" className="block px-3 py-2 text-base font-medium text-gray-600" onClick={() => setIsOpen(false)}>Inicio</Link>
                         {!isAuthenticated ? (
                             <Link to="/login" className="block px-3 py-2 btn-primary text-center" onClick={() => setIsOpen(false)}>Ingreso</Link>
                         ) : (
                             <>
-                                <Link to="/panel" className="block px-3 py-2 text-base font-medium" onClick={() => setIsOpen(false)}>Mi Panel</Link>
-                                <button onClick={handleLogout} className="block w-full text-left px-3 py-2 text-base font-medium text-red-500">Cerrar Sesión</button>
+                                <Link
+                                    to={user?.rol?.toUpperCase() === 'ADMIN' ? '/admin' : user?.rol?.toUpperCase() === 'PROFESIONAL' ? '/profesional' : '/familia'}
+                                    className="block px-3 py-4 text-base font-black text-primary bg-primary/5 rounded-2xl flex items-center gap-3 transition-all active:scale-95"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    <div className="w-10 h-10 bg-white shadow-sm rounded-full flex items-center justify-center border border-primary/20">
+                                        <User size={20} />
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="leading-tight">{user?.nombre} {user?.apellido}</span>
+                                        <span className="text-[10px] uppercase tracking-widest opacity-60">Ver Mi Panel</span>
+                                    </div>
+                                </Link>
+                                <button
+                                    onClick={() => { handleLogout(); setIsOpen(false); }}
+                                    className="block w-full text-left px-3 py-3 text-base font-bold text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                                >
+                                    Cerrar Sesión
+                                </button>
                             </>
                         )}
                     </div>

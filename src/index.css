@@ -74,6 +74,13 @@
   .tracking-tighter {
     letter-spacing: -0.05em;
   }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Keyframe Animations */

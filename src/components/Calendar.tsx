@@ -125,64 +125,68 @@ const Calendar: React.FC<CalendarProps> = ({
     return (
         <div className="bg-white rounded-3xl shadow-xl border-2 border-gray-50 overflow-hidden">
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary to-accent p-6 text-white">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                        <CalendarIcon size={32} className="font-black" />
+            <div className="bg-gradient-to-r from-primary to-accent p-4 md:p-6 text-white">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <div className="flex items-center gap-3 md:gap-4">
+                        <CalendarIcon size={28} className="font-black md:size-8" />
                         <div>
-                            <h2 className="text-3xl font-black tracking-tighter">{getTitle()}</h2>
-                            <p className="text-xs font-bold uppercase tracking-widest opacity-90">Gestión de Turnos</p>
+                            <h2 className="text-xl md:text-3xl font-black tracking-tighter">{getTitle()}</h2>
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-90">Gestión de Turnos</p>
                         </div>
                     </div>
                     <button
                         onClick={() => setShowAddModal(true)}
-                        className="px-6 py-3 bg-white text-primary rounded-2xl font-black text-sm hover:shadow-xl transition-all flex items-center gap-2"
+                        className="w-full sm:w-auto px-6 py-3 bg-white text-primary rounded-2xl font-black text-xs md:text-sm hover:shadow-xl transition-all flex items-center justify-center gap-2"
                     >
                         <Plus size={18} />
                         Nuevo Turno
                     </button>
                 </div>
 
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <button onClick={goToPrevious} className="p-2 hover:bg-white/20 rounded-xl transition-all">
-                            <ChevronLeft size={20} />
-                        </button>
-                        <button onClick={goToToday} className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold text-sm transition-all">
-                            Hoy
-                        </button>
-                        <button onClick={goToNext} className="p-2 hover:bg-white/20 rounded-xl transition-all">
-                            <ChevronRight size={20} />
-                        </button>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center justify-between md:justify-start gap-2 bg-white/10 p-1 rounded-2xl">
+                        <div className="flex items-center gap-1">
+                            <button onClick={goToPrevious} className="p-2 hover:bg-white/20 rounded-xl transition-all">
+                                <ChevronLeft size={20} />
+                            </button>
+                            <button onClick={goToToday} className="px-4 py-2 hover:bg-white/20 rounded-xl font-bold text-xs uppercase tracking-widest transition-all">
+                                Hoy
+                            </button>
+                            <button onClick={goToNext} className="p-2 hover:bg-white/20 rounded-xl transition-all">
+                                <ChevronRight size={20} />
+                            </button>
+                        </div>
                     </div>
 
-                    <div className="flex gap-2">
-                        {(['day', 'week', 'month'] as ViewMode[]).map(mode => (
-                            <button
-                                key={mode}
-                                onClick={() => setViewMode(mode)}
-                                className={`px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-widest transition-all ${viewMode === mode ? 'bg-white text-primary' : 'bg-white/20 hover:bg-white/30'
-                                    }`}
-                            >
-                                {mode === 'day' ? 'Día' : mode === 'week' ? 'Semana' : 'Mes'}
-                            </button>
-                        ))}
+                    <div className="flex bg-white/10 p-1 rounded-2xl overflow-x-auto no-scrollbar">
+                        <div className="flex flex-nowrap gap-1 min-w-max">
+                            {(['day', 'week', 'month'] as ViewMode[]).map(mode => (
+                                <button
+                                    key={mode}
+                                    onClick={() => setViewMode(mode)}
+                                    className={`px-4 py-2 rounded-xl font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all shrink-0 ${viewMode === mode ? 'bg-white text-primary shadow-lg' : 'hover:bg-white/10'
+                                        }`}
+                                >
+                                    {mode === 'day' ? 'Día' : mode === 'week' ? 'Semana' : 'Mes'}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Vista Día */}
             {viewMode === 'day' && (
-                <div className="p-6">
-                    <div className="grid grid-cols-[80px_1fr] gap-4">
+                <div className="p-4 md:p-6 overflow-x-auto">
+                    <div className="grid grid-cols-[60px_1fr] md:grid-cols-[80px_1fr] gap-2 md:gap-4 min-w-[300px]">
                         <div className="space-y-4 pt-8">
                             {hours.map(hour => (
-                                <div key={hour} className="h-20 text-xs font-black text-gray-400 text-right pr-4">
+                                <div key={hour} className="h-20 text-[10px] md:text-xs font-black text-gray-400 text-right pr-2 md:pr-4">
                                     {hour}:00
                                 </div>
                             ))}
                         </div>
-                        <div className="border-l-2 border-gray-100 pl-4 space-y-4 pt-8">
+                        <div className="border-l-2 border-gray-100 pl-2 md:pl-4 space-y-4 pt-8">
                             {hours.map(hour => {
                                 const hourTurnos = getTurnosForDate(currentDate).filter(t => {
                                     const startHour = parseInt(t.horaInicio.split(':')[0]);
@@ -194,14 +198,14 @@ const Calendar: React.FC<CalendarProps> = ({
                                             <div
                                                 key={turno.id}
                                                 onClick={() => setSelectedTurno(turno)}
-                                                className={`absolute left-0 right-0 p-3 rounded-xl border-2 cursor-pointer hover:shadow-lg transition-all ${estadoColors[turno.estado]}`}
+                                                className={`absolute left-0 right-0 p-2 md:p-3 rounded-xl border-2 cursor-pointer hover:shadow-lg transition-all ${estadoColors[turno.estado]}`}
                                             >
-                                                <div className="flex items-center justify-between">
+                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-1">
                                                     <div>
-                                                        <p className="font-black text-sm">{turno.pacienteNombre}</p>
-                                                        <p className="text-xs font-bold opacity-75">{turno.profesionalNombre}</p>
+                                                        <p className="font-black text-[11px] md:text-sm line-clamp-1">{turno.pacienteNombre}</p>
+                                                        <p className="text-[9px] md:text-xs font-bold opacity-75 line-clamp-1">{turno.profesionalNombre}</p>
                                                     </div>
-                                                    <div className="text-xs font-black">
+                                                    <div className="text-[9px] md:text-xs font-black bg-white/50 px-2 py-0.5 rounded-lg self-start">
                                                         {turno.horaInicio} - {turno.horaFin}
                                                     </div>
                                                 </div>
@@ -217,15 +221,15 @@ const Calendar: React.FC<CalendarProps> = ({
 
             {/* Vista Semana */}
             {viewMode === 'week' && (
-                <div className="p-6 overflow-x-auto">
-                    <div className="grid grid-cols-[80px_repeat(7,minmax(150px,1fr))] gap-2">
+                <div className="p-4 md:p-6 overflow-x-auto no-scrollbar">
+                    <div className="grid grid-cols-[60px_repeat(7,minmax(120px,1fr))] md:grid-cols-[80px_repeat(7,minmax(150px,1fr))] gap-2">
                         <div></div>
                         {getWeekDays().map((day, i) => (
                             <div key={i} className="text-center pb-4 border-b-2 border-gray-100">
-                                <p className="text-xs font-black text-gray-400 uppercase tracking-widest">
+                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                     {day.toLocaleDateString('es-ES', { weekday: 'short' })}
                                 </p>
-                                <p className={`text-2xl font-black mt-1 ${day.toDateString() === new Date().toDateString() ? 'text-primary' : 'text-gray-800'
+                                <p className={`text-xl md:text-2xl font-black mt-1 ${day.toDateString() === new Date().toDateString() ? 'text-primary' : 'text-gray-800'
                                     }`}>
                                     {day.getDate()}
                                 </p>
@@ -234,7 +238,7 @@ const Calendar: React.FC<CalendarProps> = ({
 
                         {hours.map(hour => (
                             <React.Fragment key={hour}>
-                                <div className="text-xs font-black text-gray-400 text-right pr-4 pt-2">
+                                <div className="text-[10px] md:text-xs font-black text-gray-400 text-right pr-2 md:pr-4 pt-2">
                                     {hour}:00
                                 </div>
                                 {getWeekDays().map((day, i) => {
@@ -243,15 +247,15 @@ const Calendar: React.FC<CalendarProps> = ({
                                         return startHour === hour;
                                     });
                                     return (
-                                        <div key={i} className="min-h-[60px] border border-gray-50 rounded-xl p-1 space-y-1">
+                                        <div key={i} className="min-h-[60px] md:min-h-[80px] border border-gray-50 rounded-xl p-1 md:p-2 space-y-1">
                                             {dayTurnos.map(turno => (
                                                 <div
                                                     key={turno.id}
                                                     onClick={() => setSelectedTurno(turno)}
-                                                    className={`p-2 rounded-lg text-xs cursor-pointer hover:shadow-md transition-all ${estadoColors[turno.estado]}`}
+                                                    className={`p-1.5 md:p-2 rounded-lg cursor-pointer hover:shadow-md transition-all ${estadoColors[turno.estado]}`}
                                                 >
-                                                    <p className="font-black truncate">{turno.pacienteNombre}</p>
-                                                    <p className="font-bold opacity-75 text-[10px] truncate">{turno.profesionalNombre}</p>
+                                                    <p className="font-black text-[10px] md:text-xs truncate">{turno.pacienteNombre}</p>
+                                                    <p className="font-bold opacity-75 text-[8px] md:text-[10px] truncate">{turno.profesionalNombre}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -265,8 +269,8 @@ const Calendar: React.FC<CalendarProps> = ({
 
             {/* Vista Mes */}
             {viewMode === 'month' && (
-                <div className="p-6">
-                    <div className="grid grid-cols-7 gap-2">
+                <div className="p-4 md:p-6 overflow-x-auto">
+                    <div className="grid grid-cols-7 gap-1 md:gap-2 min-w-[600px] md:min-w-0">
                         {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
                             <div key={day} className="text-center text-xs font-black text-gray-400 uppercase tracking-widest pb-2">
                                 {day}
@@ -362,9 +366,9 @@ const TurnoDetailModal: React.FC<{
                     <div>
                         <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">Estado</p>
                         <span className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest inline-block ${turno.estado === 'CONFIRMADO' ? 'bg-green-100 text-green-700' :
-                                turno.estado === 'PENDIENTE' ? 'bg-yellow-100 text-yellow-700' :
-                                    turno.estado === 'CANCELADO' ? 'bg-red-100 text-red-700' :
-                                        'bg-blue-100 text-blue-700'
+                            turno.estado === 'PENDIENTE' ? 'bg-yellow-100 text-yellow-700' :
+                                turno.estado === 'CANCELADO' ? 'bg-red-100 text-red-700' :
+                                    'bg-blue-100 text-blue-700'
                             }`}>
                             {turno.estado}
                         </span>
@@ -411,7 +415,8 @@ const AddTurnoModal: React.FC<{
         horaInicio: '09:00',
         horaFin: '10:00',
         estado: 'CONFIRMADO' as const,
-        notas: ''
+        notas: '',
+        notificarEmail: true
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -521,7 +526,7 @@ const AddTurnoModal: React.FC<{
                             </div>
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="md:col-span-2 space-y-2">
                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Notas (Opcional)</label>
                             <textarea
                                 value={form.notas}
@@ -531,7 +536,20 @@ const AddTurnoModal: React.FC<{
                             />
                         </div>
 
-                        <button type="submit" className="w-full btn-primary py-5 rounded-2xl shadow-xl shadow-primary/20 font-black text-sm uppercase tracking-widest">
+                        <div className="md:col-span-2 flex items-center gap-3 p-4 bg-orange-50 rounded-2xl border border-orange-100">
+                            <input
+                                type="checkbox"
+                                id="notificarEmailCalendar"
+                                checked={form.notificarEmail}
+                                onChange={(e) => setForm({ ...form, notificarEmail: e.target.checked })}
+                                className="w-5 h-5 rounded-lg border-orange-200 text-primary focus:ring-primary/20 cursor-pointer"
+                            />
+                            <label htmlFor="notificarEmailCalendar" className="text-xs font-black text-orange-900 uppercase tracking-widest cursor-pointer">
+                                Notificar por email a la familia
+                            </label>
+                        </div>
+
+                        <button type="submit" className="md:col-span-2 w-full btn-primary py-5 rounded-2xl shadow-xl shadow-primary/20 font-black text-sm uppercase tracking-widest">
                             Crear Turno
                         </button>
                     </form>

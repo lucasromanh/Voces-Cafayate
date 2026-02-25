@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { X, Download, FileText, Phone, MapPin, Mail, Globe } from 'lucide-react';
-import { Informe, Paciente, Profesional } from '../types';
+import { Informe, Paciente, InformeTecnicoFonoaudiologia } from '../types';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -60,153 +60,303 @@ const ReportViewer: React.FC<ReportViewerProps> = ({ informe, paciente, profesio
                 </div>
 
                 {/* Printable Content */}
-                <div className="overflow-y-auto p-4 md:p-12 flex justify-center bg-gray-100/50">
+                <div className="overflow-y-auto p-4 md:p-8 flex justify-center bg-gray-100/50">
                     <div
                         ref={reportRef}
-                        className="bg-white w-full max-w-[210mm] min-h-[297mm] p-[20mm] shadow-xl mx-auto flex flex-col text-gray-800 font-sans"
-                        style={{ aspectRatio: '1 / 1.414' }}
+                        className="bg-white w-full max-w-[210mm] p-[12mm] shadow-xl mx-auto flex flex-col text-gray-800 font-sans"
+                        style={{ minHeight: '297mm' }}
                     >
-                        {/* Header with Logo and Center Info */}
-                        <div className="flex justify-between items-start border-b-2 border-primary pb-8 mb-10">
+                        {/* ── ENCABEZADO INSTITUCIONAL ── */}
+                        <div className="flex justify-between items-start border-b-2 border-primary pb-5 mb-6">
                             <div>
-                                <img src="/logo.png" alt="Voces Cafayate" className="h-20 mb-4" />
-                                <h1 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">Voces Cafayate</h1>
-                                <p className="text-xs font-bold text-primary uppercase tracking-widest">Centro de Neurodesarrollo e Interdisciplina</p>
+                                <img src="/logo.png" alt="Voces Cafayate" className="h-14 mb-3" />
+                                <h1 className="text-xl font-black text-gray-900 tracking-tighter uppercase">Voces Cafayate</h1>
+                                <p className="text-[9px] font-bold text-primary uppercase tracking-widest">Centro Interdisciplinario de Atención</p>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Cafayate · Salta · Argentina</p>
                             </div>
-                            <div className="text-right space-y-1 mt-4">
-                                <div className="flex items-center justify-end gap-2 text-[10px] font-bold text-gray-500">
+                            <div className="text-right space-y-1 mt-1">
+                                <div className="flex items-center justify-end gap-2 text-[8px] font-bold text-gray-500">
                                     <span>Pje. San Cayetano 123, Cafayate, Salta</span>
-                                    <MapPin size={12} className="text-primary" />
+                                    <MapPin size={9} className="text-primary" />
                                 </div>
-                                <div className="flex items-center justify-end gap-2 text-[10px] font-bold text-gray-500">
+                                <div className="flex items-center justify-end gap-2 text-[8px] font-bold text-gray-500">
                                     <span>+54 3868 438285</span>
-                                    <Phone size={12} className="text-primary" />
+                                    <Phone size={9} className="text-primary" />
                                 </div>
-                                <div className="flex items-center justify-end gap-2 text-[10px] font-bold text-gray-500">
+                                <div className="flex items-center justify-end gap-2 text-[8px] font-bold text-gray-500">
                                     <span>centrovoces.cafayate@gmail.com</span>
-                                    <Mail size={12} className="text-primary" />
+                                    <Mail size={9} className="text-primary" />
                                 </div>
-                                <div className="flex items-center justify-end gap-2 text-[10px] font-bold text-gray-500">
+                                <div className="flex items-center justify-end gap-2 text-[8px] font-bold text-gray-500">
                                     <span>www.vocescafayate.com.ar</span>
-                                    <Globe size={12} className="text-primary" />
+                                    <Globe size={9} className="text-primary" />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Report Title Section */}
-                        <div className={`p-6 rounded-2xl mb-10 flex justify-between items-center ${mode === 'GENERAL' ? 'bg-primary text-white' : 'bg-gray-900 text-white'}`}>
+                        {/* ── TÍTULO DEL INFORME ── */}
+                        <div className={`p-4 rounded-xl mb-5 flex justify-between items-start ${mode === 'GENERAL' ? 'bg-primary text-white' : 'bg-gray-900 text-white'}`}>
                             <div>
-                                <h2 className="text-2xl font-black tracking-tighter uppercase">
+                                <p className={`text-[8px] font-black uppercase tracking-[0.2em] mb-1 ${mode === 'GENERAL' ? 'text-white/70' : 'text-primary'}`}>
+                                    VOCES — DISCIPLINA: {informe.especialidadProfesional?.toUpperCase()}
+                                </p>
+                                <h2 className="text-lg font-black tracking-tighter uppercase">
                                     {mode === 'GENERAL' ? 'Informe para la Familia' : `Informe de ${informe.especialidadProfesional}`}
                                 </h2>
-                                <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${mode === 'GENERAL' ? 'text-white/80' : 'text-primary'}`}>
+                                <p className={`text-[8px] font-bold uppercase tracking-widest mt-0.5 ${mode === 'GENERAL' ? 'text-white/60' : 'text-gray-400'}`}>
                                     {informe.tipo.replace(/_/g, ' ')}
                                 </p>
                             </div>
-                            <div className="text-right">
-                                <p className="text-[10px] font-bold uppercase opacity-60">Fecha de Emisión</p>
-                                <p className="text-lg font-black">{new Date(informe.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                            <div className="text-right flex-shrink-0 ml-4">
+                                <p className="text-[8px] font-bold uppercase opacity-60">Fecha de Emisión</p>
+                                <p className="text-sm font-black">
+                                    {new Date(informe.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                </p>
                             </div>
                         </div>
 
-                        {/* Patient & Professional Grid */}
-                        <div className="grid grid-cols-2 gap-8 mb-10">
-                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-3">Datos del Paciente</h4>
-                                <div className="space-y-1">
-                                    <p className="text-lg font-black text-gray-900 leading-tight">{paciente?.nombre} {paciente?.apellido}</p>
-                                    <p className="text-sm font-bold text-gray-500 uppercase">DNI: {paciente?.documento}</p>
-                                    <p className="text-sm font-bold text-gray-500 uppercase">F. Nac: {paciente?.fechaNacimiento ? new Date(paciente.fechaNacimiento).toLocaleDateString() : 'N/A'}</p>
-                                </div>
+                        {/* ── SECCIÓN 1: IDENTIFICACIÓN ── */}
+                        <SectionTitle number={1} title="Identificación" />
+                        <div className="grid grid-cols-2 gap-4 mt-2 mb-4">
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <h4 className="text-[8px] font-black text-primary uppercase tracking-widest mb-2">Datos del Paciente</h4>
+                                <p className="text-sm font-black text-gray-900 leading-tight">{paciente?.nombre} {paciente?.apellido}</p>
+                                <p className="text-[9px] font-bold text-gray-500 uppercase mt-0.5">DNI: {paciente?.documento}</p>
+                                <p className="text-[9px] font-bold text-gray-500 uppercase">
+                                    F. NAC: {paciente?.fechaNacimiento ? new Date(paciente.fechaNacimiento).toLocaleDateString('es-AR') : 'N/A'}
+                                </p>
+                                {paciente?.tieneCUD && (
+                                    <p className="text-[9px] font-bold text-green-700 uppercase mt-0.5">CUD N°: {paciente.numeroCUD}</p>
+                                )}
                             </div>
-                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-                                <h4 className="text-[10px] font-black text-primary uppercase tracking-widest mb-3">Profesional a Cargo</h4>
-                                <div className="space-y-1">
-                                    <p className="text-lg font-black text-gray-900 leading-tight">Lic. {profesional?.nombre} {profesional?.apellido}</p>
-                                    <p className="text-sm font-bold text-gray-500 uppercase">{informe.especialidadProfesional}</p>
-                                    <p className="text-sm font-bold text-gray-500 uppercase">M.P. {profesional?.id === 'p1' ? '1234' : '----'}</p>
-                                </div>
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                <h4 className="text-[8px] font-black text-primary uppercase tracking-widest mb-2">Profesional a Cargo</h4>
+                                <p className="text-sm font-black text-gray-900 leading-tight">Lic. {profesional?.nombre} {profesional?.apellido}</p>
+                                <p className="text-[9px] font-bold text-gray-500 uppercase mt-0.5">{informe.especialidadProfesional}</p>
+                                <p className="text-[9px] font-bold text-gray-500 uppercase">M.P. {profesional?.id === 'p1' ? '1234' : '----'}</p>
                             </div>
                         </div>
 
-                        {/* Report Sections */}
-                        <div className="flex-1 space-y-8">
-                            {/* Situación Actual - Siempre visible pero con título adaptado */}
-                            <section>
-                                <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest border-l-4 border-primary pl-4 mb-4">
-                                    {mode === 'GENERAL' ? 'I. ¿Cómo estamos hoy?' : 'I. Situación y Evolución Clínica'}
-                                </h4>
-                                <div className="space-y-4 ml-5">
-                                    <div>
-                                        <p className="text-[10px] font-black text-primary uppercase mb-1">
-                                            {mode === 'GENERAL' ? 'Resumen de la situación' : 'Situación Actual'}
-                                        </p>
-                                        <p className="text-sm leading-relaxed text-gray-700">{informe.informeGeneral?.situacionActual || 'No se registra situación actual.'}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-primary uppercase mb-1">
-                                            {mode === 'GENERAL' ? 'Avances logrados' : 'Progreso Observado'}
-                                        </p>
-                                        <p className="text-sm leading-relaxed text-gray-700">{informe.informeGeneral?.progresoObservado || 'No se registran progresos.'}</p>
-                                    </div>
+                        {/* ── MODO COMPLETO — FONOAUDIOLOGÍA ── */}
+                        {mode === 'COMPLETO' && informe.especialidadProfesional === 'Fonoaudiología' && (
+                            <FonoInformeTecnico informe={informe} />
+                        )}
+
+                        {/* ── MODO COMPLETO — OTRAS ESPECIALIDADES ── */}
+                        {mode === 'COMPLETO' && informe.especialidadProfesional !== 'Fonoaudiología' && (
+                            <div className="space-y-4 mb-4">
+                                <SectionTitle number={2} title="Situación y Evolución Clínica" />
+                                <div className="ml-3 space-y-2">
+                                    <ReportField label="Situación Actual" value={informe.informeGeneral?.situacionActual} />
+                                    <ReportField label="Progreso Observado" value={informe.informeGeneral?.progresoObservado} />
                                 </div>
-                            </section>
-
-                            <section>
-                                <h4 className="text-sm font-black text-gray-900 uppercase tracking-widest border-l-4 border-primary pl-4 mb-4">
-                                    {mode === 'GENERAL' ? 'II. Consejos y Próximos Pasos' : 'II. Plan de Trabajo y Sugerencias'}
-                                </h4>
-                                <div className="space-y-4 ml-5">
-                                    <div>
-                                        <p className="text-[10px] font-black text-primary uppercase mb-1">
-                                            {mode === 'GENERAL' ? 'Para hacer en casa' : 'Recomendaciones para el Hogar'}
-                                        </p>
-                                        <p className="text-sm leading-relaxed text-gray-700">{informe.informeGeneral?.recomendacionesFamilia || 'Sin recomendaciones específicas.'}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-primary uppercase mb-1">
-                                            {mode === 'GENERAL' ? '¿Cómo seguimos?' : 'Próximos Pasos en Tratamiento'}
-                                        </p>
-                                        <p className="text-sm leading-relaxed text-gray-700">{informe.informeGeneral?.proximosPasos || 'Continuar con el plan de trabajo actual.'}</p>
-                                    </div>
+                                <SectionTitle number={3} title="Plan y Recomendaciones" />
+                                <div className="ml-3 space-y-2">
+                                    <ReportField label="Recomendaciones" value={informe.informeGeneral?.recomendacionesFamilia} />
+                                    <ReportField label="Próximos Pasos" value={informe.informeGeneral?.proximosPasos} />
                                 </div>
-                            </section>
+                            </div>
+                        )}
 
-                            {/* Secciones Técnicas solo en modo COMPLETO */}
-                            {mode === 'COMPLETO' && informe.requiereInterconsulta && informe.especialidadesInterconsulta && (
-                                <section className="bg-orange-50 p-6 rounded-2xl border border-orange-100">
-                                    <h4 className="text-sm font-black text-orange-900 uppercase tracking-widest mb-3">Sugerencia de Interconsulta</h4>
-                                    <p className="text-sm text-orange-800 font-medium mb-3">Se sugiere evaluación por las siguientes especialidades:</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {informe.especialidadesInterconsulta.map(esp => (
-                                            <span key={esp} className="px-3 py-1 bg-white border border-orange-200 rounded-lg text-[10px] font-black text-orange-900 uppercase">{esp}</span>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-                        </div>
+                        {/* ── MODO GENERAL — PARA FAMILIA ── */}
+                        {mode === 'GENERAL' && (
+                            <div className="space-y-4 mb-4">
+                                <SectionTitle number={2} title="¿Cómo estamos hoy?" />
+                                <div className="ml-3 space-y-2">
+                                    <ReportField label="Resumen de la situación" value={informe.informeGeneral?.situacionActual} />
+                                    <ReportField label="Avances logrados" value={informe.informeGeneral?.progresoObservado} />
+                                </div>
+                                <SectionTitle number={3} title="Fortalezas observadas" />
+                                <div className="ml-3">
+                                    <ReportField label="" value={informe.informeGeneral?.areasFortaleza} />
+                                </div>
+                                <SectionTitle number={4} title="Consejos y próximos pasos" />
+                                <div className="ml-3 space-y-2">
+                                    <ReportField label="Para hacer en casa" value={informe.informeGeneral?.recomendacionesFamilia} />
+                                    <ReportField label="Actividades recomendadas" value={informe.informeGeneral?.actividadesCasa} />
+                                    <ReportField label="¿Cómo seguimos?" value={informe.informeGeneral?.proximosPasos} />
+                                </div>
+                            </div>
+                        )}
 
-                        {/* Footer / Signatures Area */}
-                        <div className="mt-20 pt-10 grid grid-cols-2 gap-20">
+                        {/* ── INTERCONSULTA ── */}
+                        {mode === 'COMPLETO' && informe.requiereInterconsulta && informe.especialidadesInterconsulta && (
+                            <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4">
+                                <h4 className="text-[9px] font-black text-orange-900 uppercase tracking-widest mb-2">Sugerencia de Interconsulta</h4>
+                                <p className="text-[9px] text-orange-800 font-medium mb-2">Se sugiere evaluación por las siguientes especialidades:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    {informe.especialidadesInterconsulta.map(esp => (
+                                        <span key={esp} className="px-3 py-1 bg-white border border-orange-200 rounded-lg text-[8px] font-black text-orange-900 uppercase">{esp}</span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* ── FIRMAS ── */}
+                        <div className="mt-auto pt-8 grid grid-cols-2 gap-16">
                             <div className="text-center">
-                                <div className="w-48 h-[1px] bg-gray-300 mx-auto mb-2" />
-                                <p className="text-[10px] font-black uppercase text-gray-900">Lic. {profesional?.nombre} {profesional?.apellido}</p>
+                                <div className="w-40 h-[1px] bg-gray-300 mx-auto mb-2" />
+                                <p className="text-[9px] font-black uppercase text-gray-900">Lic. {profesional?.nombre} {profesional?.apellido}</p>
                                 <p className="text-[8px] font-bold uppercase text-gray-400">Firma y Sello del Profesional</p>
+                                <p className="text-[8px] font-bold text-gray-400">{informe.especialidadProfesional}</p>
                             </div>
                             <div className="text-center">
-                                <div className="w-48 h-[1px] bg-gray-300 mx-auto mb-2" />
-                                <p className="text-[10px] font-black uppercase text-gray-900">Dirección Médica</p>
-                                <p className="text-[8px] font-bold uppercase text-gray-400">Voces Cafayate</p>
+                                <div className="w-40 h-[1px] bg-gray-300 mx-auto mb-2" />
+                                <p className="text-[9px] font-black uppercase text-gray-900">Dirección Médica</p>
+                                <p className="text-[8px] font-bold uppercase text-gray-400">VOCES — Centro Interdisciplinario</p>
                             </div>
                         </div>
 
-                        {/* Document Footer */}
-                        <div className="mt-auto pt-10 text-center border-t border-gray-100">
-                            <p className="text-[8px] font-bold text-gray-300 uppercase tracking-widest">Este documento tiene carácter de informe clínico y es confidencial. Voces Cafayate - Centro de Interdisciplina.</p>
+                        {/* ── PIE DE PÁGINA ── */}
+                        <div className="mt-6 pt-4 text-center border-t border-gray-100">
+                            <p className="text-[7px] font-bold text-gray-300 uppercase tracking-widest">
+                                Documento clínico confidencial — VOCES Centro Interdisciplinario de Atención — Cafayate, Salta, Argentina
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    );
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// Sub-componente: Secciones técnicas fonoaudiológicas completas (2–10)
+// ══════════════════════════════════════════════════════════════════════
+const FonoInformeTecnico: React.FC<{ informe: Informe }> = ({ informe }) => {
+    const fono = informe.informeTecnico as InformeTecnicoFonoaudiologia;
+    if (!fono) return null;
+
+    return (
+        <div className="space-y-3 mb-4">
+
+            {/* 2. MOTIVO DE CONSULTA */}
+            {fono.motivoConsulta && <>
+                <SectionTitle number={2} title="Motivo de Consulta" />
+                <div className="ml-3 mt-1 mb-1">
+                    <p className="text-[9px] leading-relaxed text-gray-700">{fono.motivoConsulta}</p>
+                </div>
+            </>}
+
+            {/* 3. ANTECEDENTES */}
+            {(fono.antecedentesPerinatal || fono.antecedentesDesarrolloLenguaje || fono.antecedentesEscolaridad || fono.antecedentesMedicos) && <>
+                <SectionTitle number={3} title="Antecedentes Relevantes" />
+                <div className="ml-3 space-y-1.5">
+                    <ReportField label="Perinatales" value={fono.antecedentesPerinatal} />
+                    <ReportField label="Desarrollo del Lenguaje" value={fono.antecedentesDesarrolloLenguaje} />
+                    <ReportField label="Escolaridad" value={fono.antecedentesEscolaridad} />
+                    <ReportField label="Antecedentes Médicos" value={fono.antecedentesMedicos} />
+                </div>
+            </>}
+
+            {/* 4. EVALUACIÓN */}
+            {(fono.evaluacionObservacionClinica || fono.evaluacionEstructuralOrofacial ||
+                fono.evaluacionLenguajeComprension || fono.evaluacionLenguajeExpresion ||
+                fono.evaluacionArticulatoria || fono.evaluacionFluidez || fono.evaluacionVoz) && <>
+                    <SectionTitle number={4} title="Evaluación Fonoaudiológica" />
+                    <div className="ml-3 grid grid-cols-2 gap-x-6 gap-y-1.5">
+                        <ReportField label="4.1 Observación Clínica" value={fono.evaluacionObservacionClinica} />
+                        <ReportField label="4.2 Estructural Orofacial" value={fono.evaluacionEstructuralOrofacial} />
+                        <ReportField label="4.3a Lenguaje — Comprensión" value={fono.evaluacionLenguajeComprension} />
+                        <ReportField label="4.3b Lenguaje — Expresión" value={fono.evaluacionLenguajeExpresion} />
+                        <div className="col-span-2">
+                            <ReportField label="4.4 Articulación" value={fono.evaluacionArticulatoria} />
+                        </div>
+                        <ReportField label="4.5 Fluidez" value={fono.evaluacionFluidez} />
+                        <ReportField label="4.6 Voz" value={fono.evaluacionVoz} />
+                        <ReportField label="4.7 Deglución" value={fono.evaluacionDeglucion} />
+                        <ReportField label="4.8 Audición" value={fono.evaluacionAudicion} />
+                        <div className="col-span-2">
+                            <ReportField label="4.9 Praxias Bucofonatorias" value={fono.evaluacionPraxias} />
+                        </div>
+                    </div>
+                </>}
+
+            {/* 5. ANÁLISIS CLÍNICO */}
+            {fono.analisisClinico && <>
+                <SectionTitle number={5} title="Análisis Clínico" />
+                <div className="ml-3 mt-1 bg-indigo-50/60 p-3 rounded-lg border-l-2 border-indigo-300">
+                    <p className="text-[9px] leading-relaxed text-gray-700 italic whitespace-pre-line">{fono.analisisClinico}</p>
+                </div>
+            </>}
+
+            {/* 6. IMPRESIÓN FONOAUDIOLÓGICA */}
+            {fono.impresionFonoaudiologica && <>
+                <SectionTitle number={6} title="Impresión Fonoaudiológica" />
+                <div className="ml-3 mt-1 bg-violet-50/60 p-3 rounded-lg border-l-2 border-violet-400">
+                    <p className="text-[9px] font-bold leading-relaxed text-violet-900 whitespace-pre-line">{fono.impresionFonoaudiologica}</p>
+                </div>
+            </>}
+
+            {/* 7. OBJETIVOS TERAPÉUTICOS */}
+            {fono.objetivosTerapeuticos && <>
+                <SectionTitle number={7} title="Objetivos Terapéuticos" />
+                <div className="ml-3 mt-1">
+                    <p className="text-[9px] leading-relaxed text-gray-700 whitespace-pre-line">{fono.objetivosTerapeuticos}</p>
+                </div>
+            </>}
+
+            {/* 8. PLAN DE INTERVENCIÓN */}
+            {(fono.planFrecuencia || fono.planModalidad || fono.planEstrategias) && <>
+                <SectionTitle number={8} title="Plan de Intervención" />
+                <div className="ml-3 mt-1 space-y-1.5">
+                    {fono.planFrecuencia && (
+                        <div className="flex gap-2">
+                            <span className="text-[8px] font-black text-gray-400 uppercase w-20 flex-shrink-0 pt-0.5">Frecuencia:</span>
+                            <span className="text-[9px] text-gray-700">{fono.planFrecuencia}</span>
+                        </div>
+                    )}
+                    {fono.planModalidad && (
+                        <div className="flex gap-2">
+                            <span className="text-[8px] font-black text-gray-400 uppercase w-20 flex-shrink-0 pt-0.5">Modalidad:</span>
+                            <span className="text-[9px] text-gray-700">{fono.planModalidad}</span>
+                        </div>
+                    )}
+                    <ReportField label="Estrategias Terapéuticas" value={fono.planEstrategias} />
+                </div>
+            </>}
+
+            {/* 9. RECOMENDACIONES */}
+            {(fono.recomendacionesFamilia || fono.recomendacionesEscuela) && <>
+                <SectionTitle number={9} title="Recomendaciones" />
+                <div className="ml-3 mt-1 space-y-1.5">
+                    <ReportField label="Para la Familia" value={fono.recomendacionesFamilia} />
+                    <ReportField label="Para la Institución Educativa" value={fono.recomendacionesEscuela} />
+                </div>
+            </>}
+
+            {/* 10. CONCLUSIÓN */}
+            {fono.conclusion && <>
+                <SectionTitle number={10} title="Conclusión" />
+                <div className="ml-3 mt-1 bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <p className="text-[9px] leading-relaxed text-gray-600 whitespace-pre-line">{fono.conclusion}</p>
+                </div>
+            </>}
+
+        </div>
+    );
+};
+
+// ══════════════════════════════════════
+// Helpers de presentación del informe
+// ══════════════════════════════════════
+const SectionTitle: React.FC<{ number: number; title: string }> = ({ number, title }) => (
+    <div className="flex items-center gap-2 mt-2">
+        <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-white font-black text-[9px] flex-shrink-0">
+            {number}
+        </div>
+        <h4 className="text-[10px] font-black text-gray-900 uppercase tracking-widest border-b border-gray-200 flex-1 pb-0.5">
+            {title}
+        </h4>
+    </div>
+);
+
+const ReportField: React.FC<{ label: string; value?: string }> = ({ label, value }) => {
+    if (!value) return null;
+    return (
+        <div className="mb-0.5">
+            {label && <p className="text-[8px] font-black text-primary uppercase tracking-widest mb-0.5">{label}</p>}
+            <p className="text-[9px] leading-relaxed text-gray-700 whitespace-pre-line">{value}</p>
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, FileText, Users, AlertCircle, CheckCircle2, Sparkles } from 'lucide-react';
+import { X, FileText, Users, AlertCircle, CheckCircle2, Sparkles, Mic, Ear, Brain, ClipboardList, Target, Stethoscope } from 'lucide-react';
 import {
     Especialidad,
     InformeTecnicoPsicologia,
@@ -90,13 +90,25 @@ const InformeForm: React.FC<InformeFormProps> = ({ especialidad, pacienteId, onC
                 case 'Fonoaudiología':
                     const fono = informeTecnico as InformeTecnicoFonoaudiologia;
                     generado = {
-                        situacionActual: fono.motivoConsulta ? `Consulta por ${fono.motivoConsulta.toLowerCase()}.` : '',
-                        progresoObservado: fono.desarrolloLenguaje ? `Se observa desarrollo en el lenguaje.` : '',
-                        areasFortaleza: fono.lenguajeComprensivo ? `Buena comprensión del lenguaje.` : '',
-                        areasTrabajar: fono.planTerapeutico || '',
-                        recomendacionesFamilia: 'Estimular la comunicación en el hogar mediante juegos y lectura compartida.',
-                        actividadesCasa: 'Ejercicios de articulación y lectura diaria.',
-                        proximosPasos: fono.planTerapeutico || ''
+                        situacionActual: fono.motivoConsulta
+                            ? `El/la paciente asiste a consulta fonoaudiológica por ${fono.motivoConsulta.toLowerCase()}.`
+                            : '',
+                        progresoObservado: fono.analisisClinico
+                            ? fono.analisisClinico.substring(0, 200) + (fono.analisisClinico.length > 200 ? '...' : '')
+                            : fono.evaluacionLenguajeExpresion ? 'Se observan aspectos en desarrollo en el área del lenguaje.' : '',
+                        areasFortaleza: fono.evaluacionLenguajeComprension
+                            ? 'Se observa una adecuada comprensión del lenguaje a nivel contextual.'
+                            : '',
+                        areasTrabajar: fono.objetivosTerapeuticos || fono.planEstrategias || '',
+                        recomendacionesFamilia: fono.recomendacionesFamilia
+                            || 'Se sugiere estimular la comunicación en el hogar mediante juegos, lectura compartida y conversación cotidiana.',
+                        actividadesCasa: `Realizar los ejercicios indicados por el/la profesional. ${fono.planFrecuencia ? 'Frecuencia sugerida de sesiones: ' + fono.planFrecuencia + '.' : ''}`,
+                        proximosPasos: fono.planEstrategias
+                            ? `Continuaremos trabajando con las siguientes estrategias: ${fono.planEstrategias.substring(0, 150)}...`
+                            : fono.impresionFonoaudiologica || '',
+                        observacionesAdicionales: fono.recomendacionesEscuela
+                            ? `Recomendaciones para la institución educativa: ${fono.recomendacionesEscuela}`
+                            : ''
                     };
                     break;
 
@@ -399,24 +411,268 @@ const FormFonoaudiologia: React.FC<{ data: any; onChange: (data: any) => void }>
     const update = (field: string, value: any) => onChange({ ...data, [field]: value });
 
     return (
-        <div className="space-y-6">
-            <h4 className="font-black text-sm uppercase tracking-widest text-primary border-b border-primary/20 pb-2">
-                Evaluación Fonoaudiológica
-            </h4>
+        <div className="space-y-8">
 
-            <InputField label="Motivo de Consulta" value={data.motivoConsulta} onChange={(v) => update('motivoConsulta', v)} />
-            <TextAreaField label="Antecedentes" value={data.antecedentes} onChange={(v) => update('antecedentes', v)} />
-            <TextAreaField label="Desarrollo del Lenguaje" value={data.desarrolloLenguaje} onChange={(v) => update('desarrolloLenguaje', v)} />
-            <TextAreaField label="Lenguaje Comprensivo" value={data.lenguajeComprensivo} onChange={(v) => update('lenguajeComprensivo', v)} />
-            <TextAreaField label="Lenguaje Expresivo" value={data.lenguajeExpresivo} onChange={(v) => update('lenguajeExpresivo', v)} />
-            <TextAreaField label="Articulación" value={data.articulacion} onChange={(v) => update('articulacion', v)} />
-            <TextAreaField label="Fluidez Verbal" value={data.fluidezVerbal} onChange={(v) => update('fluidezVerbal', v)} />
-            <TextAreaField label="Voz y Resonancia" value={data.vozResonancia} onChange={(v) => update('vozResonancia', v)} />
-            <TextAreaField label="Deglución" value={data.deglucion} onChange={(v) => update('deglucion', v)} />
-            <TextAreaField label="Audición" value={data.audicion} onChange={(v) => update('audicion', v)} />
-            <TextAreaField label="Praxias Bucofonatorias" value={data.praxiasBucofonatorias} onChange={(v) => update('praxiasBucofonatorias', v)} />
-            <TextAreaField label="Diagnóstico Fonoaudiológico" value={data.diagnosticoFonoaudiologico} onChange={(v) => update('diagnosticoFonoaudiologico', v)} />
-            <TextAreaField label="Plan Terapéutico" value={data.planTerapeutico} onChange={(v) => update('planTerapeutico', v)} />
+            {/* Banner Institucional */}
+            <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white p-5 rounded-2xl flex items-start gap-4">
+                <div className="p-2 bg-white/20 rounded-xl flex-shrink-0">
+                    <Mic size={20} />
+                </div>
+                <div>
+                    <p className="font-black text-xs uppercase tracking-widest mb-1">Protocolo Clínico Institucional — Fonoaudiología</p>
+                    <p className="text-[11px] text-white/80 leading-relaxed">
+                        Utilizar: &quot;se observa&quot; · &quot;se evidencia&quot; · &quot;se infiere&quot; · &quot;presenta indicadores compatibles con&quot;.
+                        No emitir diagnósticos médicos ni psicológicos.
+                    </p>
+                </div>
+            </div>
+
+            {/* SECCIÓN 2 — MOTIVO DE CONSULTA */}
+            <FonoSectionHeader number={2} title="Motivo de Consulta" icon={<ClipboardList size={16} />} />
+            <div className="bg-teal-50/50 p-6 rounded-2xl space-y-4 border border-teal-100">
+                <p className="text-[10px] font-black text-teal-700 uppercase tracking-widest">
+                    Redactar en términos clínicos, evitando lenguaje coloquial
+                </p>
+                <TextAreaField
+                    label="Motivo de Consulta"
+                    value={data.motivoConsulta}
+                    onChange={(v) => update('motivoConsulta', v)}
+                    placeholder="Ej: Consulta por dificultades en la adquisición del sistema fonológico con impacto en la inteligibilidad del habla en contexto conversacional..."
+                />
+            </div>
+
+            {/* SECCIÓN 3 — ANTECEDENTES RELEVANTES */}
+            <FonoSectionHeader number={3} title="Antecedentes Relevantes" icon={<Brain size={16} />} />
+            <div className="bg-teal-50/50 p-6 rounded-2xl space-y-5 border border-teal-100">
+                <TextAreaField
+                    label="Antecedentes Perinatales"
+                    value={data.antecedentesPerinatal}
+                    onChange={(v) => update('antecedentesPerinatal', v)}
+                    placeholder="Gestación, tipo de parto, período neonatal, lactancia materna/artificial..."
+                />
+                <TextAreaField
+                    label="Desarrollo del Lenguaje"
+                    value={data.antecedentesDesarrolloLenguaje}
+                    onChange={(v) => update('antecedentesDesarrolloLenguaje', v)}
+                    placeholder="Primeras palabras, frases, vocabulario, hitos comunicativos, balbuceo..."
+                />
+                <TextAreaField
+                    label="Escolaridad"
+                    value={data.antecedentesEscolaridad}
+                    onChange={(v) => update('antecedentesEscolaridad', v)}
+                    placeholder="Nivel escolar, desempeño, apoyo pedagógico, adaptaciones curriculares..."
+                />
+                <TextAreaField
+                    label="Antecedentes Médicos Relevantes"
+                    value={data.antecedentesMedicos}
+                    onChange={(v) => update('antecedentesMedicos', v)}
+                    placeholder="Enfermedades, intervenciones quirúrgicas, estudios complementarios, tratamientos fonoaudiológicos previos..."
+                />
+            </div>
+
+            {/* SECCIÓN 4 — EVALUACIÓN FONOAUDIOLÓGICA */}
+            <FonoSectionHeader number={4} title="Evaluación Fonoaudiológica" icon={<Stethoscope size={16} />} />
+            <div className="bg-teal-50/50 p-6 rounded-2xl space-y-4 border border-teal-100">
+                <p className="text-[10px] font-black text-teal-700 uppercase tracking-widest mb-2">
+                    Describir procedimientos aplicados y hallazgos objetivos
+                </p>
+
+                <div className="space-y-4">
+                    <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                        <TextAreaField
+                            label="4.1 — Observación Clínica"
+                            value={data.evaluacionObservacionClinica}
+                            onChange={(v) => update('evaluacionObservacionClinica', v)}
+                            placeholder="Conducta durante la evaluación, nivel de atención y motivación, tipo de interacción comunicativa, actitud frente a la tarea..."
+                        />
+                    </div>
+                    <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                        <TextAreaField
+                            label="4.2 — Evaluación Estructural Orofacial"
+                            value={data.evaluacionEstructuralOrofacial}
+                            onChange={(v) => update('evaluacionEstructuralOrofacial', v)}
+                            placeholder="Labios, lengua, paladar duro/blando, dentición, oclusión, frenillo lingual/labial, tonicidad muscular orofacial..."
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                            <TextAreaField
+                                label="4.3a — Lenguaje: Comprensión"
+                                value={data.evaluacionLenguajeComprension}
+                                onChange={(v) => update('evaluacionLenguajeComprension', v)}
+                                placeholder="Comprensión de consignas simples/complejas, vocabulario receptivo, instrucciones de 2/3 pasos..."
+                            />
+                        </div>
+                        <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                            <TextAreaField
+                                label="4.3b — Lenguaje: Expresión"
+                                value={data.evaluacionLenguajeExpresion}
+                                onChange={(v) => update('evaluacionLenguajeExpresion', v)}
+                                placeholder="Vocabulario expresivo, morfosintaxis, narrativa, longitud media de enunciado (LME)..."
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                        <TextAreaField
+                            label="4.4 — Evaluación Articulatoria"
+                            value={data.evaluacionArticulatoria}
+                            onChange={(v) => update('evaluacionArticulatoria', v)}
+                            placeholder="Fonemas comprometidos, procesos de simplificación fonológica, inteligibilidad en contexto aislado y conectado..."
+                        />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                            <TextAreaField
+                                label="4.5 — Fluidez"
+                                value={data.evaluacionFluidez}
+                                onChange={(v) => update('evaluacionFluidez', v)}
+                                placeholder="Velocidad del habla, pausas, repeticiones, bloqueos, tensión muscular visible..."
+                            />
+                        </div>
+                        <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                            <TextAreaField
+                                label="4.6 — Voz"
+                                value={data.evaluacionVoz}
+                                onChange={(v) => update('evaluacionVoz', v)}
+                                placeholder="Calidad vocal, tono, intensidad, resonancia, tiempo máximo de fonación (TMF)..."
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                            <TextAreaField
+                                label="4.7 — Deglución"
+                                value={data.evaluacionDeglucion}
+                                onChange={(v) => update('evaluacionDeglucion', v)}
+                                placeholder="Deglución de sólidos/líquidos, patrón deglutorio, posición lingual, signos de disfagia si aplica..."
+                            />
+                        </div>
+                        <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                            <TextAreaField
+                                label="4.8 — Audición"
+                                value={data.evaluacionAudicion}
+                                onChange={(v) => update('evaluacionAudicion', v)}
+                                placeholder="Respuesta a estímulos auditivos, antecedentes otológicos, estudios audiológicos previos..."
+                            />
+                        </div>
+                    </div>
+                    <div className="bg-white/80 p-4 rounded-xl border border-teal-100">
+                        <TextAreaField
+                            label="4.9 — Praxias Bucofonatorias"
+                            value={data.evaluacionPraxias}
+                            onChange={(v) => update('evaluacionPraxias', v)}
+                            placeholder="Praxias labiales, linguales, mandibulares, velares. Coordinación fonoarticulatoria..."
+                        />
+                    </div>
+                </div>
+            </div>
+
+            {/* SECCIÓN 5 — ANÁLISIS CLÍNICO */}
+            <FonoSectionHeader number={5} title="Análisis Clínico" icon={<Brain size={16} />} />
+            <div className="bg-indigo-50/50 p-6 rounded-2xl space-y-4 border border-indigo-100">
+                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">
+                    Usar: &quot;se observa&quot; / &quot;se evidencia&quot; / &quot;se infiere&quot; / &quot;presenta indicadores compatibles con&quot;
+                </p>
+                <TextAreaField
+                    label="Análisis e Interpretación Clínica"
+                    value={data.analisisClinico}
+                    onChange={(v) => update('analisisClinico', v)}
+                    placeholder="Se observa un perfil comunicativo caracterizado por...&#10;Se evidencia compromiso en el plano...&#10;Se infiere que las dificultades articulatorias presentan indicadores compatibles con..."
+                />
+            </div>
+
+            {/* SECCIÓN 6 — IMPRESIÓN FONOAUDIOLÓGICA */}
+            <FonoSectionHeader number={6} title="Impresión Fonoaudiológica" icon={<FileText size={16} />} />
+            <div className="bg-violet-50/50 p-6 rounded-2xl space-y-4 border border-violet-100">
+                <div className="bg-white/80 rounded-xl p-4 border border-violet-100 space-y-2">
+                    <p className="text-[10px] text-violet-700 font-black uppercase">Ejemplos orientativos:</p>
+                    <ul className="text-[10px] text-gray-500 space-y-1 list-disc list-inside">
+                        <li>Cuadro compatible con trastorno fonológico de tipo funcional.</li>
+                        <li>Indicadores compatibles con retraso del lenguaje expresivo.</li>
+                        <li>No se observan alteraciones estructurales significativas.</li>
+                        <li>Perfil compatible con disfluencia típica del desarrollo.</li>
+                    </ul>
+                </div>
+                <TextAreaField
+                    label="Impresión Fonoaudiológica"
+                    value={data.impresionFonoaudiologica}
+                    onChange={(v) => update('impresionFonoaudiologica', v)}
+                    placeholder="Cuadro compatible con... / No se observan alteraciones en... / Indicadores compatibles con..."
+                />
+            </div>
+
+            {/* SECCIÓN 7 — OBJETIVOS TERAPÉUTICOS */}
+            <FonoSectionHeader number={7} title="Objetivos Terapéuticos" icon={<Target size={16} />} />
+            <div className="bg-emerald-50/50 p-6 rounded-2xl space-y-4 border border-emerald-100">
+                <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                    Objetivos claros, medibles y progresivos
+                </p>
+                <TextAreaField
+                    label="Objetivos Terapéuticos"
+                    value={data.objetivosTerapeuticos}
+                    onChange={(v) => update('objetivosTerapeuticos', v)}
+                    placeholder="Objetivo General: Mejorar la inteligibilidad del habla...&#10;&#10;Objetivos Específicos:&#10;• Adquisición del fonema /r/ simple en posición inicial&#10;• Incremento del vocabulario expresivo en contexto narrativo&#10;• Desarrollo de la conciencia fonológica a nivel silábico"
+                />
+            </div>
+
+            {/* SECCIÓN 8 — PLAN DE INTERVENCIÓN */}
+            <FonoSectionHeader number={8} title="Plan de Intervención" icon={<ClipboardList size={16} />} />
+            <div className="bg-blue-50/50 p-6 rounded-2xl space-y-5 border border-blue-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <InputField
+                        label="Frecuencia Sugerida"
+                        value={data.planFrecuencia}
+                        onChange={(v) => update('planFrecuencia', v)}
+                        placeholder="Ej: 2 sesiones semanales de 45 min"
+                    />
+                    <InputField
+                        label="Modalidad"
+                        value={data.planModalidad}
+                        onChange={(v) => update('planModalidad', v)}
+                        placeholder="Ej: Individual / Presencial / Mixta"
+                    />
+                </div>
+                <TextAreaField
+                    label="Estrategias Terapéuticas Específicas"
+                    value={data.planEstrategias}
+                    onChange={(v) => update('planEstrategias', v)}
+                    placeholder="• Estimulación fonológica mediante contraste mínimo de pares&#10;• Técnicas de modelado y retroalimentación auditiva&#10;• Ejercicios miofuncionales de tonicidad lingual&#10;• Juego simbólico como mediador lingüístico"
+                />
+            </div>
+
+            {/* SECCIÓN 9 — RECOMENDACIONES */}
+            <FonoSectionHeader number={9} title="Recomendaciones" icon={<Ear size={16} />} />
+            <div className="bg-amber-50/50 p-6 rounded-2xl space-y-5 border border-amber-100">
+                <p className="text-[10px] font-black text-amber-700 uppercase tracking-widest">
+                    Redactadas de forma técnica y prudente
+                </p>
+                <TextAreaField
+                    label="Para la Familia"
+                    value={data.recomendacionesFamilia}
+                    onChange={(v) => update('recomendacionesFamilia', v)}
+                    placeholder="Se sugiere al grupo familiar estimular la comunicación en contextos cotidianos, evitar correcciones directas del habla y privilegiar modelos lingüísticos enriquecidos..."
+                />
+                <TextAreaField
+                    label="Para la Institución Educativa"
+                    value={data.recomendacionesEscuela}
+                    onChange={(v) => update('recomendacionesEscuela', v)}
+                    placeholder="Se recomienda considerar adaptaciones en la modalidad de evaluación oral, permitir tiempo adicional para respuestas verbales..."
+                />
+            </div>
+
+            {/* SECCIÓN 10 — CONCLUSIÓN */}
+            <FonoSectionHeader number={10} title="Conclusión" icon={<CheckCircle2 size={16} />} />
+            <div className="bg-gray-50/80 p-6 rounded-2xl space-y-4 border border-gray-200">
+                <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                    Cierre profesional formal — listo para firmar y archivar en historia clínica
+                </p>
+                <TextAreaField
+                    label="Conclusión"
+                    value={data.conclusion}
+                    onChange={(v) => update('conclusion', v)}
+                    placeholder="El presente informe refleja los hallazgos obtenidos durante la evaluación fonoaudiológica realizada en el ámbito del VOCES – Centro Interdisciplinario de Atención. La información aquí consignada tiene carácter clínico-profesional, se enmarca en el alcance de la Licenciatura en Fonoaudiología y fue elaborada con fines institucionales y terapéuticos..."
+                />
+            </div>
         </div>
     );
 };
@@ -540,6 +796,20 @@ const FormInformeGeneral: React.FC<{ data: InformeGeneral; onChange: (data: Info
         </div>
     );
 };
+
+// Componente auxiliar para encabezados de sección fonoaudiológica
+const FonoSectionHeader: React.FC<{ number: number; title: string; icon?: React.ReactNode }> = ({ number, title, icon }) => (
+    <div className="flex items-center gap-3 pt-2">
+        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-teal-600 text-white font-black text-[11px] flex-shrink-0">
+            {number}
+        </div>
+        <div className="flex items-center gap-2 flex-1">
+            {icon && <span className="text-teal-700">{icon}</span>}
+            <h4 className="font-black text-sm text-gray-900 uppercase tracking-wider">{title}</h4>
+        </div>
+        <div className="flex-1 h-px bg-teal-200/60" />
+    </div>
+);
 
 // Componentes auxiliares
 const InputField: React.FC<{ label: string; value: string; onChange: (v: string) => void; placeholder?: string }> =

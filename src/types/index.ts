@@ -117,19 +117,61 @@ export interface InformeTecnicoPsicopedagogia {
 }
 
 export interface InformeTecnicoFonoaudiologia {
+    // 2. MOTIVO DE CONSULTA
     motivoConsulta: string;
-    antecedentes: string;
-    desarrolloLenguaje: string;
-    lenguajeComprensivo: string;
-    lenguajeExpresivo: string;
-    articulacion: string;
-    fluidezVerbal: string;
-    vozResonancia: string;
-    deglucion: string;
-    audicion: string;
-    praxiasBucofonatorias: string;
-    diagnosticoFonoaudiologico: string;
-    planTerapeutico: string;
+
+    // 3. ANTECEDENTES RELEVANTES
+    antecedentesPerinatal: string;
+    antecedentesDesarrolloLenguaje: string;
+    antecedentesEscolaridad: string;
+    antecedentesMedicos: string;
+
+    // 4. EVALUACIÓN FONOAUDIOLÓGICA
+    evaluacionObservacionClinica: string;
+    evaluacionEstructuralOrofacial: string;
+    evaluacionLenguajeComprension: string;
+    evaluacionLenguajeExpresion: string;
+    evaluacionArticulatoria: string;
+    evaluacionFluidez: string;
+    evaluacionVoz: string;
+    evaluacionDeglucion: string;
+    evaluacionAudicion: string;
+    evaluacionPraxias: string;
+
+    // 5. ANÁLISIS CLÍNICO
+    analisisClinico: string;
+
+    // 6. IMPRESIÓN FONOAUDIOLÓGICA
+    impresionFonoaudiologica: string;
+
+    // 7. OBJETIVOS TERAPÉUTICOS
+    objetivosTerapeuticos: string;
+
+    // 8. PLAN DE INTERVENCIÓN
+    planFrecuencia: string;
+    planModalidad: string;
+    planEstrategias: string;
+
+    // 9. RECOMENDACIONES
+    recomendacionesFamilia: string;
+    recomendacionesEscuela: string;
+
+    // 10. CONCLUSIÓN
+    conclusion: string;
+
+    // Campos legacy para compatibilidad
+    antecedentes?: string;
+    desarrolloLenguaje?: string;
+    lenguajeComprensivo?: string;
+    lenguajeExpresivo?: string;
+    articulacion?: string;
+    fluidezVerbal?: string;
+    vozResonancia?: string;
+    deglucion?: string;
+    audicion?: string;
+    praxiasBucofonatorias?: string;
+    diagnosticoFonoaudiologico?: string;
+    planTerapeutico?: string;
 }
 
 export interface InformeTecnicoKinesiologia {
